@@ -25,4 +25,5 @@ func TestManager(t *testing.T) {
 	if err != nil {
 		t.Fatalf("broken manager: %s", err)
 	}
+
 }
