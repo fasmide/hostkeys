@@ -115,8 +115,11 @@ func (m *Manager) load(g Generator) (ssh.Signer, error) {
 		return nil, err
 	}
 
-	// we should not expect to see keys larger then 1Meg
-	b, err := io.ReadAll(io.LimitReader(fd, 1024*1024))
+	// something is off we encounter a file larger then 64Kbyte
+	b, err := io.ReadAll(io.LimitReader(fd, 1024*64))
+	if err != nil {
+		return nil, err
+	}
 
 	return ssh.ParsePrivateKey(b)
 }
