@@ -58,11 +58,12 @@ func (m *Manager) storeAndLoad(g Generator) (ssh.Signer, error) {
 	}
 
 	// create private key
-	private, err := os.Create(
+	private, err := os.OpenFile(
 		path.Join(
 			m.Directory,
 			fmt.Sprintf(m.KeyFormat, g.Name()),
 		),
+		os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600,
 	)
 	if err != nil {
 		return nil, err
