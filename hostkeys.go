@@ -145,6 +145,7 @@ func (m *Manager) defaults() error {
 	if len(m.Keys) == 0 {
 		m.Keys = []Generator{
 			&generator.RSA{BitSize: 4096},
+			&generator.ED25519{},
 		}
 	}
 
