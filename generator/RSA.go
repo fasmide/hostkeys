@@ -57,7 +57,7 @@ func (r *RSA) Encode(w io.Writer) error {
 }
 
 func (r *RSA) EncodePublic(w io.Writer) error {
-	publicRsaKey, err := ssh.NewPublicKey(r.privateKey)
+	publicRsaKey, err := ssh.NewPublicKey(&r.privateKey.PublicKey)
 	if err != nil {
 		return err
 	}

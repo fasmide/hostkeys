@@ -41,7 +41,11 @@ func (m *Manager) Manage(c ssh.ServerConfig) error {
 
 		// this key should be generated, it did not exist
 		signer, err = m.storeAndLoad(k)
+		if err != nil {
+			return err
+		}
 
+		c.AddHostKey(signer)
 	}
 
 	return nil
@@ -75,7 +79,7 @@ func (m *Manager) storeAndLoad(g Generator) (ssh.Signer, error) {
 	public, err := os.Create(
 		path.Join(
 			m.Directory,
-			fmt.Sprintf(m.KeyFormat, g.Name()),
+			fmt.Sprint(fmt.Sprintf(m.KeyFormat, g.Name()), ".pub"),
 		),
 	)
 	if err != nil {
