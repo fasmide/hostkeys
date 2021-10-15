@@ -26,4 +26,16 @@ func TestManager(t *testing.T) {
 		t.Fatalf("broken manager: %s", err)
 	}
 
+	// lets see, how a new manager handles these existing keys
+	m2 := Manager{
+		Directory: dir,
+	}
+
+	config2 := ssh.ServerConfig{}
+
+	err = m2.Manage(config2)
+	if err != nil {
+		t.Fatalf("broken second manager: %s", err)
+	}
+
 }
