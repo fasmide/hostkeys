@@ -3,10 +3,9 @@ package generator
 import (
 	"crypto/rand"
 	"crypto/rsa"
-	"crypto/x509"
-	"encoding/pem"
 	"io"
 
+	"github.com/ScaleFT/sshkeys"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -43,17 +42,17 @@ func (r *RSA) Generate() error {
 }
 
 func (r *RSA) Encode(w io.Writer) error {
-	// Get ASN.1 DER format
-	privDER := x509.MarshalPKCS1PrivateKey(r.privateKey)
-
-	// pem.Block
-	privBlock := pem.Block{
-		Type:    "RSA PRIVATE KEY",
-		Headers: nil,
-		Bytes:   privDER,
+	b, err := sshkeys.Marshal(r.privateKey, &sshkeys.MarshalOptions{Format: sshkeys.FormatOpenSSHv1})
+	if err != nil {
+		return err
 	}
 
-	return pem.Encode(w, &privBlock)
+	_, err = w.Write(b)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *RSA) EncodePublic(w io.Writer) error {
