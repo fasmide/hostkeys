@@ -21,8 +21,9 @@ func (r *RSA) Name() string {
 
 func (r *RSA) Generate() error {
 	// make sure a bitsize is set
+	// https://github.com/openssh/openssh-portable/blob/master/ssh-keygen.c#L87
 	if r.BitSize == 0 {
-		r.BitSize = 4096
+		r.BitSize = 3072
 	}
 
 	// Private Key generation
