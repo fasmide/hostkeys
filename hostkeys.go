@@ -2,6 +2,7 @@ package hostkeys
 
 import (
 	"bytes"
+	"crypto/elliptic"
 	"fmt"
 	"io"
 	"os"
@@ -149,6 +150,7 @@ func (m *Manager) defaults() error {
 		m.Keys = []Generator{
 			&generator.RSA{BitSize: 3072},
 			&generator.ED25519{},
+			&generator.ECDSA{Curve: elliptic.P256()},
 		}
 	}
 
