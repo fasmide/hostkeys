@@ -27,12 +27,12 @@ func TestManager(t *testing.T) {
 
 func SshKeyTest(dir string) func(*testing.T) {
 	return func(t *testing.T) {
-		m := Manager{
+		m := &Manager{
 			Directory: dir,
 		}
 
 		// manage a dummy config to make it roll
-		m.Manage(ssh.ServerConfig{})
+		m.Manage(&ssh.ServerConfig{})
 
 		// for every key, check to see if ssh-keygen is able to parse it
 		// and produce a public-key from it, then compare the public keys
@@ -67,11 +67,11 @@ func SshKeyTest(dir string) func(*testing.T) {
 
 func ManagerTest(dir string) func(*testing.T) {
 	return func(t *testing.T) {
-		m := Manager{
+		m := &Manager{
 			Directory: dir,
 		}
 
-		config := ssh.ServerConfig{}
+		config := &ssh.ServerConfig{}
 
 		err := m.Manage(config)
 		if err != nil {
