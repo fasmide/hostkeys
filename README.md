@@ -50,3 +50,5 @@ manager := &Manager{
 	},
 }
 ```
+
+hostkeys will not update or delete existing keys. Changing key settings requires the user to manually remove the old keys to have new generated.
