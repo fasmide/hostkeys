@@ -47,6 +47,6 @@ manager := &Manager{
     Keys: []Generator{
 		&generator.RSA{BitSize: 4096},
 		&generator.ECDSA{Curve: elliptic.P521()},
-	}
+	},
 }
 ```

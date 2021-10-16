@@ -2,6 +2,7 @@ package hostkeys
 
 import (
 	"bytes"
+	"crypto/elliptic"
 	"fmt"
 	"io"
 	"os"
@@ -9,6 +10,7 @@ import (
 	"path"
 	"testing"
 
+	"github.com/fasmide/hostkeys/generator"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -20,7 +22,40 @@ func TestManager(t *testing.T) {
 
 	t.Logf("using %s", dir)
 
-	t.Run("manager", ManagerTest(dir))
+	m := &Manager{
+		Directory: dir,
+	}
+
+	err = m.Manage(&ssh.ServerConfig{})
+	if err != nil {
+		t.Fatalf("broken manager: %s", err)
+	}
+
+	t.Run("sshkeytest", SshKeyTest(dir))
+
+}
+
+func TestStrongerKeys(t *testing.T) {
+	dir, err := os.MkdirTemp("", "")
+	if err != nil {
+		t.Fatalf("could not create tempdir: %s", err)
+	}
+
+	t.Logf("stronger keys using %s", dir)
+
+	m := &Manager{
+		Directory: dir,
+		Keys: []Generator{
+			&generator.RSA{BitSize: 4096},
+			&generator.ECDSA{Curve: elliptic.P521()},
+		},
+	}
+
+	err = m.Manage(&ssh.ServerConfig{})
+	if err != nil {
+		t.Fatalf("broken manager: %s", err)
+	}
+
 	t.Run("sshkeytest", SshKeyTest(dir))
 
 }
@@ -61,21 +96,6 @@ func SshKeyTest(dir string) func(*testing.T) {
 				t.Fatalf("public keys did not match")
 			}
 
-		}
-	}
-}
-
-func ManagerTest(dir string) func(*testing.T) {
-	return func(t *testing.T) {
-		m := &Manager{
-			Directory: dir,
-		}
-
-		config := &ssh.ServerConfig{}
-
-		err := m.Manage(config)
-		if err != nil {
-			t.Fatalf("broken manager: %s", err)
 		}
 	}
 }
