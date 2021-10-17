@@ -37,7 +37,7 @@ func (m *Manager) Manage(c *ssh.ServerConfig) error {
 		}
 
 		if !os.IsNotExist(err) {
-			return err
+			return fmt.Errorf("hostkeys: invalid %s key: %w", k.Name(), err)
 		}
 
 		// this key should be generated, it did not exist
