@@ -26,7 +26,7 @@ type Manager struct {
 func (m *Manager) Manage(c *ssh.ServerConfig) error {
 	err := m.defaults()
 	if err != nil {
-		return fmt.Errorf("unable to manage keys: %w", err)
+		return fmt.Errorf("hostkeys: default settings failed: %w", err)
 	}
 
 	for _, k := range m.Keys {
