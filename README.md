@@ -35,8 +35,8 @@ if err != nil {
 Using existing openssh host keys:
 ```golang
 manager := &Manager{
-    Directory: "/etc/ssh",
-    KeyFormat: "ssh_host_%s_key",
+    Directory:    "/etc/ssh",
+    NamingScheme: "ssh_host_%s_key",
 }
 ```
 

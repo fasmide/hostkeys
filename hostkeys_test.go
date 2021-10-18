@@ -72,7 +72,7 @@ func SshKeyTest(dir string) func(*testing.T) {
 		// for every key, check to see if ssh-keygen is able to parse it
 		// and produce a public-key from it, then compare the public keys
 		for _, v := range m.Keys {
-			cmd := exec.Command("ssh-keygen", "-y", "-f", path.Join(dir, fmt.Sprintf(m.KeyFormat, v.Name())))
+			cmd := exec.Command("ssh-keygen", "-y", "-f", path.Join(dir, fmt.Sprintf(m.NamingScheme, v.Name())))
 			publicKey, err := cmd.Output()
 			if err != nil {
 				e := err.(*exec.ExitError)
@@ -81,7 +81,7 @@ func SshKeyTest(dir string) func(*testing.T) {
 			}
 
 			// check if this public key is exactly like the hostkeys produced one
-			fd, err := os.Open(fmt.Sprint(path.Join(dir, fmt.Sprintf(m.KeyFormat, v.Name())), ".pub"))
+			fd, err := os.Open(fmt.Sprint(path.Join(dir, fmt.Sprintf(m.NamingScheme, v.Name())), ".pub"))
 			if err != nil {
 				t.Fatalf("unable to open hostkeys managed public key: %s", err)
 			}

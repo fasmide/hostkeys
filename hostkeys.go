@@ -16,9 +16,9 @@ type Manager struct {
 	// Directory where keys are stored
 	Directory string
 
-	// KeyFormat, defaults to <executable>_host_<keytype>_key
+	// NamingScheme, defaults to "<executable>_host_<keytype>_key"
 	// must include a %s for inserting keytype
-	KeyFormat string
+	NamingScheme string
 
 	Keys []Generator
 }
@@ -62,7 +62,7 @@ func (m *Manager) storeAndLoad(g Generator) (ssh.Signer, error) {
 	private, err := os.OpenFile(
 		path.Join(
 			m.Directory,
-			fmt.Sprintf(m.KeyFormat, g.Name()),
+			fmt.Sprintf(m.NamingScheme, g.Name()),
 		),
 		os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600,
 	)
@@ -81,7 +81,7 @@ func (m *Manager) storeAndLoad(g Generator) (ssh.Signer, error) {
 	public, err := os.Create(
 		path.Join(
 			m.Directory,
-			fmt.Sprint(fmt.Sprintf(m.KeyFormat, g.Name()), ".pub"),
+			fmt.Sprint(fmt.Sprintf(m.NamingScheme, g.Name()), ".pub"),
 		),
 	)
 	if err != nil {
@@ -109,7 +109,7 @@ func (m *Manager) load(g Generator) (ssh.Signer, error) {
 	fd, err := os.Open(
 		path.Join(
 			m.Directory,
-			fmt.Sprintf(m.KeyFormat, g.Name()),
+			fmt.Sprintf(m.NamingScheme, g.Name()),
 		),
 	)
 	if err != nil {
@@ -126,14 +126,14 @@ func (m *Manager) load(g Generator) (ssh.Signer, error) {
 }
 
 func (m *Manager) defaults() error {
-	// is no KeyFormat is set, use a naming scheme similar to openssh
-	if m.KeyFormat == "" {
+	// is no NamingScheme is set, use a naming scheme similar to openssh
+	if m.NamingScheme == "" {
 		s, err := os.Readlink("/proc/self/exe")
 		if err != nil {
 			return fmt.Errorf("unable to read link of /proc/self/exe: %w", err)
 		}
 
-		m.KeyFormat = fmt.Sprintf("%s_host_%%s_key", path.Base(s))
+		m.NamingScheme = fmt.Sprintf("%s_host_%%s_key", path.Base(s))
 	}
 
 	// if no directory was provided, default to the current work directory
