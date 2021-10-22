@@ -22,7 +22,7 @@ config := &ssh.ServerConfig{
     },
 }
 
-manager := &Manager{
+manager := &hostkeys.Manager{
     Directory: "/etc/app",
 }
 
@@ -34,7 +34,7 @@ if err != nil {
 
 Using existing openssh host keys:
 ```golang
-manager := &Manager{
+manager := &hostkeys.Manager{
     Directory:    "/etc/ssh",
     NamingScheme: "ssh_host_%s_key",
 }
@@ -42,9 +42,9 @@ manager := &Manager{
 
 Using stronger keys:
 ```golang
-manager := &Manager{
+manager := &hostkeys.Manager{
     Directory: "/etc/app",
-    Keys: []Generator{
+    Keys: []hostkeys.Generator{
 		&generator.RSA{BitSize: 4096},
 		&generator.ECDSA{Curve: elliptic.P521()},
 	},
