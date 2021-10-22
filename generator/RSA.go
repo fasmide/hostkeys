@@ -3,14 +3,17 @@ package generator
 import (
 	"crypto/rand"
 	"crypto/rsa"
+	"encoding/pem"
+	"fmt"
 	"io"
 
-	"github.com/ScaleFT/sshkeys"
+	"github.com/fasmide/hostkeys/internal/marshal"
 	"golang.org/x/crypto/ssh"
 )
 
 type RSA struct {
 	BitSize int
+	Comment string
 
 	privateKey *rsa.PrivateKey
 }
@@ -43,17 +46,12 @@ func (r *RSA) Generate() error {
 }
 
 func (r *RSA) Encode(w io.Writer) error {
-	b, err := sshkeys.Marshal(r.privateKey, &sshkeys.MarshalOptions{Format: sshkeys.FormatOpenSSHv1})
+	block, err := marshal.MarshalPrivateKey(r.privateKey, r.Comment)
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to marshal private key: %w", err)
 	}
 
-	_, err = w.Write(b)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return pem.Encode(w, block)
 }
 
 func (r *RSA) EncodePublic(w io.Writer) error {

@@ -4,30 +4,34 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
+	"encoding/pem"
+	"fmt"
 	"io"
 
-	"github.com/ScaleFT/sshkeys"
+	"github.com/fasmide/hostkeys/internal/marshal"
 	"golang.org/x/crypto/ssh"
 )
 
 type ECDSA struct {
-	Curve      elliptic.Curve
+	Curve   elliptic.Curve
+	Comment string
+
 	privateKey *ecdsa.PrivateKey
 }
 
-func (r *ECDSA) Name() string {
+func (e *ECDSA) Name() string {
 	return "ecdsa"
 }
 
-func (r *ECDSA) Generate() error {
+func (e *ECDSA) Generate() error {
 	// lets pick a default curve
 	// https://github.com/openssh/openssh-portable/blob/master/ssh-keygen.c#L89
-	if r.Curve == nil {
-		r.Curve = elliptic.P256()
+	if e.Curve == nil {
+		e.Curve = elliptic.P256()
 	}
 
 	var err error
-	r.privateKey, err = ecdsa.GenerateKey(r.Curve, rand.Reader)
+	e.privateKey, err = ecdsa.GenerateKey(e.Curve, rand.Reader)
 	if err != nil {
 		return err
 	}
@@ -35,22 +39,17 @@ func (r *ECDSA) Generate() error {
 	return nil
 }
 
-func (r *ECDSA) Encode(w io.Writer) error {
-	b, err := sshkeys.Marshal(r.privateKey, &sshkeys.MarshalOptions{Format: sshkeys.FormatClassicPEM})
+func (e *ECDSA) Encode(w io.Writer) error {
+	block, err := marshal.MarshalPrivateKey(e.privateKey, e.Comment)
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to marshal private key: %w", err)
 	}
 
-	_, err = w.Write(b)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return pem.Encode(w, block)
 }
 
-func (r *ECDSA) EncodePublic(w io.Writer) error {
-	publicecdsaKey, err := ssh.NewPublicKey(&r.privateKey.PublicKey)
+func (e *ECDSA) EncodePublic(w io.Writer) error {
+	publicecdsaKey, err := ssh.NewPublicKey(&e.privateKey.PublicKey)
 	if err != nil {
 		return err
 	}
