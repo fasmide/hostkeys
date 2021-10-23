@@ -12,17 +12,30 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
+// Manager configures hostkeys
 type Manager struct {
 	// Directory where keys are stored
+	//
+	// default: current work directory
 	Directory string
 
-	// NamingScheme, defaults to "<executable>_host_<keytype>_key"
-	// must include a %s for inserting keytype
+	// NamingScheme specifies naming scheme for keys.
+	// Must include a %s for inserting keytype.
+	//
+	// To use existing openssh keys: "ssh_host_%s_key"
+	//
+	// default: determines executable name at runtime
+	// and sets the value to "<executable>_host_%s_key"
 	NamingScheme string
 
+	// Keys defines which types of keys to manage.
+	//
+	// default: a set of keys similar to openssh,
+	// rsa 3072 bits, ecdsa P256, and an ed25519 key.
 	Keys []Generator
 }
 
+// Manage sets up a *ssh.ServerConfig with keys by generating or reuseing existing keys.
 func (m *Manager) Manage(c *ssh.ServerConfig) error {
 	err := m.defaults()
 	if err != nil {
